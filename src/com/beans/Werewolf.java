@@ -6,40 +6,70 @@ import java.util.List;
 /**
  * Created by Administrator on 2017/4/16.
  */
+
 public class Werewolf {
     /**
      * 上帝ID
-     * 预言家是否存在
-     * 女巫是否存在
-     * 猎人是否存在
-     * 白痴是否存在
-     * 小偷是否存在
-     * 丘比特是否存在
-     * 守卫是否存在
-     * 长老是否存在
-     * 小女孩是否存在
      */
-    private String godId;
+     private RoomUser god;
+
+    /**
+     * 预言家是否存在
+     */
     private boolean seerIs;
+
+    /**
+     * 女巫是否存在
+     */
     private boolean witchIs;
-    private boolean hunterIs;
+
+     /**
+      * 猎人是否存在
+      */
+     private boolean hunterIs;
+
+    /**
+     * 白痴是否存在
+     */
     private boolean idiotIs;
+
+    /**
+     * 小偷是否存在
+     */
     private boolean thiefIs;
+
+    /**
+     *  丘比特是否存在
+     */
     private boolean cupidIs;
+
+    /**
+     *  守卫是否存在
+     */
     private boolean guardIs;
+
+    /**
+     *  长老是否存在
+     */
     private boolean presbyterIs;
+
+    /**
+     *  小女孩是否存在
+     */
     private boolean girlIs;
+    /**
+     *  狼人数量
+     */
     private int werewolfnum;
+    /**
+     *  村民数量
+     */
     private int villagernum;
+    /**
+     * 未参与者名单
+     */
     private List<RoomUser> unplayerlist=new ArrayList<>();
 
-    public String getGodId() {
-        return godId;
-    }
-
-    public void setGodId(String godId) {
-        this.godId = godId;
-    }
 
     public boolean isSeerIs() {
         return seerIs;
@@ -136,10 +166,12 @@ public class Werewolf {
     public void setunPlayerlist(List<RoomUser> unplayerlist) {
         this.unplayerlist = unplayerlist;
     }
-    //enum Type{
-//        seer(1);
-//
-//    Type(int i) {
-//    }
-//}
+
+    public RoomUser getGod() {
+        return god;
+    }
+
+    public void setGod(RoomUser god) {
+        this.god = god;
+    }
 }

@@ -64,8 +64,23 @@ public class ContextListener implements ServletContextListener {
 		RoomUser roomuser=new RoomUser();
 		roomuser.setUserId("123");
 		roomuser.setNickname("nick");
+		RoomUser roomuser1=new RoomUser();
+		roomuser1.setUserId("1234");
+		roomuser1.setNickname("nick1");
+		RoomUser roomuser2=new RoomUser();
+		roomuser2.setUserId("12345");
+		roomuser2.setNickname("nick2");
+		RoomUser roomuser3=new RoomUser();
+		roomuser3.setUserId("1111");
+		roomuser3.setNickname("nick");
+
+
 		List<RoomUser> list=new ArrayList<>();
 		list.add(roomuser);
+		list.add(roomuser1);
+		list.add(roomuser2);
+		list.add(roomuser3);
+
 		room.setUserlist(list);
 		lab.setList(room);
 	}

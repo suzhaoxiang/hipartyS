@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.beans.*;
 import com.google.gson.Gson;
+import com.utils.LabUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Controller;
@@ -123,21 +124,118 @@ public class UserController {
 
 	@RequestMapping("/test")
 	@ResponseBody
-	public Chater Test(String json) {
-		Chater chater = new Chater();
-		User user = new User();
-		user.setPassword("123");
-		user.setUsername("wef");
-		List<String> list = new ArrayList<String>();
-		list.add("123");
-		list.add("132");
-		Map<String, String> map =new HashMap<>();
-		map.put("userId", "ir");
-		map.put("roomId", "agrd");
+	public Chater Test() {
+		RoomUser roomuser=new RoomUser();
+		roomuser.setUserId("123");
+		roomuser.setNickname("nick");
 
-		chater.setObject(map);
-
-		return chater;
+		Werewolf werewolf=new Werewolf();
+		werewolf.setGod(roomuser);
+		Chater chater=new Chater();
+		chater.setRoomId("111");
+		chater.setUserId("123");
+		chater.setOrder("beginwerewolf");
+		chater.setObject(werewolf);
+		Lab lab=Lab.getLab();
+		List<RoomUser> playerlist= LabUtils.FindRoom(chater.getRoomId()).getUserlist();
+		for(int i=0;i<werewolf.getunPlayerlist().size();i++){
+			playerlist.remove(werewolf.getunPlayerlist().get(i));
+		}
+		Chater chater2=new Chater();
+		chater2.setOrder("beginwerewolf");
+		chater2.setRoomId(chater.getRoomId());
+		//上帝
+		chater2.setMessage("God");
+		return chater2;
+//		//预言家
+//		int j = (int) ((Math.random() * 1000) % playerlist.size());
+//		if (werewolf.isSeerIs()) {
+//			RoomUser player = playerlist.get(j);
+//			playerlist.remove(player);
+//			chater2.setMessage("预言家");
+//			chater2.setUserId(player.getUserId());
+//			return chater2;
+//		}
+//		//女巫
+//		if (werewolf.isWitchIs()) {
+//			RoomUser player = playerlist.get(j);
+//			playerlist.remove(player);
+//			chater2.setMessage("女巫");
+//			chater2.setUserId(player.getUserId());
+//			return chater2;
+//		}
+//		//猎人
+//		if (werewolf.isHunterIs()) {
+//			RoomUser player = playerlist.get(j);
+//			playerlist.remove(player);
+//			chater2.setMessage("猎人");
+//			chater2.setUserId(player.getUserId());
+//			return chater2;
+//		}
+//		//盗贼
+//		if (werewolf.isThiefIs()) {
+//			RoomUser player = playerlist.get(j);
+//			playerlist.remove(player);
+//			chater2.setMessage("盗贼");
+//			chater2.setUserId(player.getUserId());
+//			return chater2;
+//		}
+//		//白痴
+//		if (werewolf.isIdiotIs()) {
+//			RoomUser player = playerlist.get(j);
+//			playerlist.remove(player);
+//			chater2.setMessage("白痴");
+//			chater2.setUserId(player.getUserId());
+//			return chater2;
+//		}
+//		//丘比特
+//		if (werewolf.isCupidIs()) {
+//			RoomUser player = playerlist.get(j);
+//			playerlist.remove(player);
+//			chater2.setMessage("丘比特");
+//			chater2.setUserId(player.getUserId());
+//			return chater2;
+//		}
+//		//守卫
+//		if (werewolf.isGuardIs()) {
+//			RoomUser player = playerlist.get(j);
+//			playerlist.remove(player);
+//			chater2.setMessage("守卫");
+//			chater2.setUserId(player.getUserId());
+//			return chater2;
+//		}
+//		//小女孩
+//		if (werewolf.isGirlIs()) {
+//			RoomUser player = playerlist.get(j);
+//			playerlist.remove(player);
+//			chater2.setMessage("小女孩");
+//			chater2.setUserId(player.getUserId());
+//			return chater2;
+//		}
+//		//长老
+//		if (werewolf.isPresbyterIs()) {
+//			RoomUser player = playerlist.get(j);
+//			playerlist.remove(player);
+//			chater2.setMessage("长老");
+//			chater2.setUserId(player.getUserId());
+//			return chater2;
+//		}
+//		//狼人
+//		for (int i = 0; i < werewolf.getWerewolfnum(); i++) {
+//			RoomUser player = playerlist.get(i);
+//			playerlist.remove(player);
+//			chater2.setMessage("狼人");
+//			chater2.setUserId(player.getUserId());
+//			return chater2;
+//		}
+//		//村民
+//		for (int i = 0; i < werewolf.getVillagernum(); i++) {
+//			RoomUser player = playerlist.get(i);
+//			playerlist.remove(player);
+//			chater2.setMessage("村民");
+//			chater2.setUserId(player.getUserId());
+//			return chater2;
+//		}
 	}
 
 	@RequestMapping("/download")

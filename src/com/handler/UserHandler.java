@@ -103,8 +103,7 @@ public class UserHandler implements IoHandler {
 
 			//上帝
 			chater2.setMessage("God");
-			chater2.setUserId(werewolf.getGodId());
-			SendSingle(chater2, LabUtils.FindRoomUser(chater.getRoomId(), werewolf.getGodId()).getSession());
+			SendSingle(chater2,werewolf.getGod().getSession());
 
 			//预言家
 			if (werewolf.isSeerIs()) {
