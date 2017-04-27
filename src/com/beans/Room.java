@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.google.gson.Gson;
+import com.utils.LabUtils;
 import com.utils.RoomUtils;
+import org.apache.mina.core.session.IoSession;
 
 public class Room {
 
@@ -49,7 +52,6 @@ public class Room {
 		return starttime;
 	}
 	public void setStarttime(Date starttime) {
-
 		this.starttime = starttime;
 	}
 	public int getRoomnum() {
@@ -64,6 +66,26 @@ public class Room {
 	}
 	public void setRoomutils(RoomUtils roomutils) {
 		this.roomutils = roomutils;
+	}
+
+	public void sendSingle(Chater chater, IoSession iossession){
+		String msg = new Gson().toJson(chater);
+		iossession.write(msg);
+	}
+
+	public void sendAll(Chater chater){
+		String msg = new Gson().toJson(chater);
+		System.out.println("SendAll");
+		for(int j=0;j<roomnum;j++){
+			userlist.get(j).getSession().write(msg);
+		}
+	}
+
+	public String checkHost(String userId){
+		if(hostId.equals(userId)){
+			return "SUCCEED";
+		}
+		return "Not Host";
 	}
 
 }

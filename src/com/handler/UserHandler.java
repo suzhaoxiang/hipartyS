@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.beans.*;
+import com.nhandler.handlerImpl.HandlerInterface;
+import com.utils.BeanFactory;
 import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
@@ -39,6 +41,12 @@ public class UserHandler implements IoHandler {
 		Gson gson = new Gson();
 		Chater chater = gson.fromJson(decode.toString(), Chater.class);
 		System.out.println(decode);
+		BeanFactory beanFactory=new BeanFactory("com/nhandler/bean.xml");
+		HandlerInterface myHandler = (HandlerInterface) beanFactory.getObject(chater.getOrder());
+		if (myHandler!=null){
+			myHandler.handle(iossession,chater);
+		}
+
 		switch(chater.getOrder()){
 			case "create":handleCreate(iossession, chater);
 				break;
@@ -60,149 +68,9 @@ public class UserHandler implements IoHandler {
 				break;
 			case "ensure_warmgame":handleEnsureWarmGame(iossession,chater);
 				break;
-			case "searchroom":handleSearchRoom(iossession,chater);
-				break;
-			case "werewolf":handleWerewolf(iossession,chater);
-				break;
-			case "beginwerewolf":handleBeginWerewolf(iossession,chater);
 			default:
 				break;
 		}
-	}
-
-	private void handleSearchRoom(IoSession iossession, Chater chater) {
-		String roomname =chater.getMessage();
-		List<RoomDTO> roomDTOlist=new ArrayList<>();
-		Chater chater2 = new Chater();
-		chater2.setOrder("searchroom");
-		chater2.setMessage("SUCCEED");
-		chater2.setRoomId(chater.getRoomId());
-		chater2.setUserId(chater.getUserId());
-		for(int i=0;i<lab.getList().size();i++){
-			if(lab.getList().get(i).getRoomname().equals(roomname)){
-				RoomDTO roomDTO=new RoomDTO();
-				roomDTO.setRoomId(lab.getList().get(i).getRoomId());
-				roomDTO.setRoomname(lab.getList().get(i).getRoomname());
-				roomDTO.setHostId(lab.getList().get(i).getHostId());
-				roomDTOlist.add(roomDTO);
-			}
-		}
-		chater2.setObject(roomDTOlist);
-		SendSingle(chater2,iossession);
-	}
-
-	private void handleBeginWerewolf(IoSession iossession, Chater chater) {
-		Werewolf werewolf= (Werewolf) chater.getObject();
-		List<RoomUser> playerlist=LabUtils.FindRoom(chater.getRoomId()).getUserlist();
-		for(int i=0;i<werewolf.getunPlayerlist().size();i++){
-			playerlist.remove(werewolf.getunPlayerlist().get(i));
-		}
-		Chater chater2=new Chater();
-		chater2.setOrder("beginwerewolf");
-		chater2.setRoomId(chater.getRoomId());
-
-			//上帝
-			chater2.setMessage("God");
-			SendSingle(chater2,werewolf.getGod().getSession());
-
-			//预言家
-			if (werewolf.isSeerIs()) {
-				RoomUser player = playerlist.get((int) (Math.random() * 1000) % playerlist.size());
-				playerlist.remove(player);
-				chater2.setMessage("预言家");
-				chater2.setUserId(player.getUserId());
-				SendSingle(chater2, player.getSession());
-			}
-			//女巫
-			if (werewolf.isWitchIs()) {
-				RoomUser player = playerlist.get((int) (Math.random() * 1000) % playerlist.size());
-				playerlist.remove(player);
-				chater2.setMessage("女巫");
-				chater2.setUserId(player.getUserId());
-				SendSingle(chater2, player.getSession());
-			}
-			//猎人
-			if (werewolf.isHunterIs()) {
-				RoomUser player = playerlist.get((int) (Math.random() * 1000) % playerlist.size());
-				playerlist.remove(player);
-				chater2.setMessage("猎人");
-				chater2.setUserId(player.getUserId());
-				SendSingle(chater2, player.getSession());
-			}
-			//盗贼
-			if (werewolf.isThiefIs()) {
-				RoomUser player = playerlist.get((int) (Math.random() * 1000) % playerlist.size());
-				playerlist.remove(player);
-				chater2.setMessage("盗贼");
-				chater2.setUserId(player.getUserId());
-				SendSingle(chater2, player.getSession());
-			}
-			//白痴
-			if (werewolf.isIdiotIs()) {
-				RoomUser player = playerlist.get((int) (Math.random() * 1000) % playerlist.size());
-				playerlist.remove(player);
-				chater2.setMessage("白痴");
-				chater2.setUserId(player.getUserId());
-				SendSingle(chater2, player.getSession());
-			}
-			//丘比特
-			if (werewolf.isCupidIs()) {
-				RoomUser player = playerlist.get((int) (Math.random() * 1000) % playerlist.size());
-				playerlist.remove(player);
-				chater2.setMessage("丘比特");
-				chater2.setUserId(player.getUserId());
-				SendSingle(chater2, player.getSession());
-			}
-			//守卫
-			if (werewolf.isGuardIs()) {
-				RoomUser player = playerlist.get((int) (Math.random() * 1000) % playerlist.size());
-				playerlist.remove(player);
-				chater2.setMessage("守卫");
-				chater2.setUserId(player.getUserId());
-				SendSingle(chater2, player.getSession());
-			}
-			//小女孩
-			if (werewolf.isGirlIs()) {
-				RoomUser player = playerlist.get((int) (Math.random() * 1000) % playerlist.size());
-				playerlist.remove(player);
-				chater2.setMessage("小女孩");
-				chater2.setUserId(player.getUserId());
-				SendSingle(chater2, player.getSession());
-			}
-			//长老
-			if (werewolf.isPresbyterIs()) {
-				RoomUser player = playerlist.get((int) (Math.random() * 1000) % playerlist.size());
-				playerlist.remove(player);
-				chater2.setMessage("长老");
-				chater2.setUserId(player.getUserId());
-				SendSingle(chater2, player.getSession());
-			}
-			//狼人
-			for (int i = 0; i < werewolf.getWerewolfnum(); i++) {
-				RoomUser player = playerlist.get((int) (Math.random() * 1000) % playerlist.size());
-				playerlist.remove(player);
-				chater2.setMessage("狼人");
-				chater2.setUserId(player.getUserId());
-				SendSingle(chater2, player.getSession());
-			}
-			//村民
-			for (int i = 0; i < werewolf.getVillagernum(); i++) {
-				RoomUser player = playerlist.get(i);
-				playerlist.remove(player);
-				chater2.setMessage("村民");
-				chater2.setUserId(player.getUserId());
-				SendSingle(chater2, player.getSession());
-			}
-	}
-
-	private void handleWerewolf(IoSession iossession, Chater chater) {
-		Chater chater2 = new Chater();
-		chater2.setOrder("werewolf");
-		chater2.setMessage("SUCCEED");
-		chater2.setRoomId(chater.getRoomId());
-		chater2.setUserId(chater.getUserId());
-		chater2.setObject(LabUtils.FindRoom(chater.getRoomId()).getUserlist());
-		SendSingle(chater2,iossession);
 	}
 
 	private void handleOut(IoSession iossession, Chater chater) {
@@ -253,9 +121,10 @@ public class UserHandler implements IoHandler {
 	}
 
 	private void handleTalk(IoSession iossession, Chater chater) {
-
+		Map<String,Object> map= new HashMap<>();
+		map.put("nickname",LabUtils.FindRoomUser(chater.getRoomId(),chater.getUserId()).getNickname());
+		chater.setObject(map);
 		SendAll(chater, chater.getRoomId());
-
 	}
 
 	private void handleEnsurePunishment(IoSession iossession, Chater chater) {
@@ -426,8 +295,7 @@ public class UserHandler implements IoHandler {
 		chater2.setOrder("introduce");
 		chater2.setRoomId(roomId);
 		chater2.setUserId(chater.getUserId());
-//		chater2.setMessage(CheckHost(roomId, chater.getUserId()));
-		chater2.setMessage("SUCCEED");
+		chater2.setMessage(CheckHost(roomId, chater.getUserId()));
 		SendAll(chater2,roomId);
 	}
 

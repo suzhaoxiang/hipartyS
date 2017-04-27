@@ -86,41 +86,7 @@ public class UserController {
 		chater.setMessage("SUCCEED");
 		return chater;
 	}
-	//暖场游戏
-	@RequestMapping(value="/warmgame")
-	@ResponseBody
-	public Chater WarmGame(String level, HttpServletRequest request){
-			Session session=sessionFactory.getCurrentSession();
-			session.beginTransaction();
-			String decode=null;
-			try {
-				decode= URLDecoder.decode(level,"utf-8");
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-				return new Chater();
-			}
 
-			List<WarmGame> warmGamelist = session.createQuery("from WarmGame where warmGameLevel=:WarmGameLevel")
-					.setParameter("WarmGameLevel", decode)
-                    .list();
-			session.getTransaction().commit();
-			String localAddr = request.getLocalAddr();
-			// 设定返回值
-			for (int i = 0; i <warmGamelist.size(); i++) {
-				String url=warmGamelist.get(i).getWarmGameUrl();
-				url=url.replace("\\","/");
-				warmGamelist.get(i).setWarmGameUrl("http://"+localAddr+":8099/user/download?url="+url);
-			}
-			Chater chater = new Chater();
-			chater.setOrder("warmgame");
-			Map<String, Object> object = new HashMap<>();
-			object.put("size", warmGamelist.size());
-			object.put("list", new Gson().toJson(warmGamelist));
-			chater.setObject(object);
-			chater.setMessage("SUCCEED");
-
-			return chater;
-	}
 
 	@RequestMapping("/test")
 	@ResponseBody
@@ -129,113 +95,42 @@ public class UserController {
 		roomuser.setUserId("123");
 		roomuser.setNickname("nick");
 
-		Werewolf werewolf=new Werewolf();
-		werewolf.setGod(roomuser);
 		Chater chater=new Chater();
 		chater.setRoomId("111");
 		chater.setUserId("123");
-		chater.setOrder("beginwerewolf");
-		chater.setObject(werewolf);
+		chater.setOrder("getlist");
+		Map<String,Object> map = new HashMap<>();
+		map.put("type","体育");
+		chater.setObject(map);
 		Lab lab=Lab.getLab();
-		List<RoomUser> playerlist= LabUtils.FindRoom(chater.getRoomId()).getUserlist();
-		for(int i=0;i<werewolf.getunPlayerlist().size();i++){
-			playerlist.remove(werewolf.getunPlayerlist().get(i));
-		}
+
+		Map<String,Object> objectMap= (Map<String, Object>) chater.getObject();
+		String type= (String) objectMap.get("type");
+		Session session=sessionFactory.getCurrentSession();
+		session.beginTransaction();
+		List<String> wordList=session.createQuery("SELECT word FROM GameWords where type=:type")
+				.setParameter("type",type)
+				.list();
+		session.getTransaction().commit();
+		List<String> sendList=new ArrayList<>();
 		Chater chater2=new Chater();
-		chater2.setOrder("beginwerewolf");
 		chater2.setRoomId(chater.getRoomId());
-		//上帝
-		chater2.setMessage("God");
+		chater2.setUserId(chater.getUserId());
+		chater2.setOrder("YouGuess");
+		if (wordList.size()==0){
+			chater2.setMessage("type error");
+			return chater2;
+		}
+		int size=wordList.size();
+		for (int i = 0; i <size ; i++) {
+			int index= (int) ((Math.random()*1000)%wordList.size());
+			sendList.add(wordList.get(index));
+			wordList.remove(index);
+		}
+		Map<String,Object> Wmap = new HashMap<>();
+		Wmap.put("wordList",sendList);
+		chater2.setObject(Wmap);
 		return chater2;
-//		//预言家
-//		int j = (int) ((Math.random() * 1000) % playerlist.size());
-//		if (werewolf.isSeerIs()) {
-//			RoomUser player = playerlist.get(j);
-//			playerlist.remove(player);
-//			chater2.setMessage("预言家");
-//			chater2.setUserId(player.getUserId());
-//			return chater2;
-//		}
-//		//女巫
-//		if (werewolf.isWitchIs()) {
-//			RoomUser player = playerlist.get(j);
-//			playerlist.remove(player);
-//			chater2.setMessage("女巫");
-//			chater2.setUserId(player.getUserId());
-//			return chater2;
-//		}
-//		//猎人
-//		if (werewolf.isHunterIs()) {
-//			RoomUser player = playerlist.get(j);
-//			playerlist.remove(player);
-//			chater2.setMessage("猎人");
-//			chater2.setUserId(player.getUserId());
-//			return chater2;
-//		}
-//		//盗贼
-//		if (werewolf.isThiefIs()) {
-//			RoomUser player = playerlist.get(j);
-//			playerlist.remove(player);
-//			chater2.setMessage("盗贼");
-//			chater2.setUserId(player.getUserId());
-//			return chater2;
-//		}
-//		//白痴
-//		if (werewolf.isIdiotIs()) {
-//			RoomUser player = playerlist.get(j);
-//			playerlist.remove(player);
-//			chater2.setMessage("白痴");
-//			chater2.setUserId(player.getUserId());
-//			return chater2;
-//		}
-//		//丘比特
-//		if (werewolf.isCupidIs()) {
-//			RoomUser player = playerlist.get(j);
-//			playerlist.remove(player);
-//			chater2.setMessage("丘比特");
-//			chater2.setUserId(player.getUserId());
-//			return chater2;
-//		}
-//		//守卫
-//		if (werewolf.isGuardIs()) {
-//			RoomUser player = playerlist.get(j);
-//			playerlist.remove(player);
-//			chater2.setMessage("守卫");
-//			chater2.setUserId(player.getUserId());
-//			return chater2;
-//		}
-//		//小女孩
-//		if (werewolf.isGirlIs()) {
-//			RoomUser player = playerlist.get(j);
-//			playerlist.remove(player);
-//			chater2.setMessage("小女孩");
-//			chater2.setUserId(player.getUserId());
-//			return chater2;
-//		}
-//		//长老
-//		if (werewolf.isPresbyterIs()) {
-//			RoomUser player = playerlist.get(j);
-//			playerlist.remove(player);
-//			chater2.setMessage("长老");
-//			chater2.setUserId(player.getUserId());
-//			return chater2;
-//		}
-//		//狼人
-//		for (int i = 0; i < werewolf.getWerewolfnum(); i++) {
-//			RoomUser player = playerlist.get(i);
-//			playerlist.remove(player);
-//			chater2.setMessage("狼人");
-//			chater2.setUserId(player.getUserId());
-//			return chater2;
-//		}
-//		//村民
-//		for (int i = 0; i < werewolf.getVillagernum(); i++) {
-//			RoomUser player = playerlist.get(i);
-//			playerlist.remove(player);
-//			chater2.setMessage("村民");
-//			chater2.setUserId(player.getUserId());
-//			return chater2;
-//		}
 	}
 
 	@RequestMapping("/download")

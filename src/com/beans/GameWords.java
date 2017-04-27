@@ -13,8 +13,17 @@ import javax.persistence.Table;
 @Entity
 @Table(name="gamewords")
 public class GameWords  {
+    /**
+     * 词组类型
+     */
     private String type;
+    /**
+     * 词组
+     */
     private String word;
+    /**
+     * 虚拟主键
+     */
     private int id;
 
     public String getType() {

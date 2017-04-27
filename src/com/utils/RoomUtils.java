@@ -1,5 +1,10 @@
 package com.utils;
 
+import com.beans.Chater;
+import com.beans.Room;
+import com.google.gson.Gson;
+import org.apache.mina.core.session.IoSession;
+
 import java.util.Date;
 import java.util.List;
 
@@ -20,5 +25,5 @@ public class RoomUtils {
 	public void setCount(int count) {
 		this.count = count;
 	}
-	
+
 }

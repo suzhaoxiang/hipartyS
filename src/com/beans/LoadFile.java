@@ -8,16 +8,26 @@ import javax.persistence.*;
 @Entity
 @Table(name="loadfile")
 public class LoadFile {
-    private String Filename;
+
+    private String type;
+    private String filename;
     private int id;
-    private String FileUrl;
+    private String fileUrl;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getFilename() {
-        return Filename;
+        return filename;
     }
 
     public void setFilename(String filename) {
-        Filename = filename;
+        filename = filename;
     }
     @Id
     @GeneratedValue
@@ -30,11 +40,11 @@ public class LoadFile {
     }
 
     public String getFileUrl() {
-        return FileUrl;
+        return fileUrl;
     }
 
     public void setFileUrl(String fileUrl) {
-        FileUrl = fileUrl;
+        fileUrl = fileUrl;
     }
 
 }
