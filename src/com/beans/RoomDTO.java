@@ -1,9 +1,11 @@
 package com.beans;
 
+import java.io.Serializable;
+
 /**
  * Created by Administrator on 2017/4/16.
  */
-public class RoomDTO {
+public class RoomDTO implements Serializable {
     private String roomname;
     private String roomId;
     private String hostId;//主持人的userId

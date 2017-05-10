@@ -1,9 +1,6 @@
 package com.controller;
 
-import com.beans.Chater;
-import com.beans.Room;
-import com.beans.RoomUser;
-import com.beans.Werewolf;
+import com.beans.*;
 import com.google.gson.Gson;
 import com.utils.HibernateUtil;
 import com.utils.LabUtils;
@@ -14,6 +11,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,27 +22,74 @@ import java.util.Map;
 /**
  * Created by Administrator on 2017/4/21.
  */
+
 @Controller
 @RequestMapping("/game")
 public class GameController {
     private SessionFactory sessionFactory= HibernateUtil.getSessionFactory();
+    //暖场游戏
+    @RequestMapping(value="/warmgame")
+    @ResponseBody
+    public Chater WarmGame(String level, HttpServletRequest request){
+        String decode=null;
+        try {
+            decode= URLDecoder.decode(level,"utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return new Chater();
+        }
+
+        Session session=sessionFactory.getCurrentSession();
+        session.beginTransaction();
+        List<WarmGame> warmGamelist = session.createQuery("from WarmGame where warmGameLevel=:WarmGameLevel")
+                .setParameter("WarmGameLevel", decode)
+                .list();
+        session.getTransaction().commit();
+        String localAddr = request.getLocalAddr();
+        // 设定返回值
+        for (int i = 0; i <warmGamelist.size(); i++) {
+            String url=warmGamelist.get(i).getWarmGameUrl();
+            url=url.replace("\\","/");
+            warmGamelist.get(i).setWarmGameUrl("http://"+localAddr+":8099/user/download?url=/ROOT/hiparty/WEB-INF/classes/loadfile/warm_game"+url);
+        }
+        Chater chater = new Chater();
+        chater.setOrder("warmgame");
+        Map<String, Object> object = new HashMap<>();
+        object.put("size", warmGamelist.size());
+        object.put("list", new Gson().toJson(warmGamelist));
+        chater.setObject(object);
+        chater.setMessage("SUCCEED");
+
+        return chater;
+    }
 
     @RequestMapping("/getlist")
     @ResponseBody
     public Chater gelist(Chater chater){
         Chater chater2 = new Chater();
         chater2.setOrder("getlist");
-        if(chater.getRoomId()==null||chater.getUserId()==null) {
-            chater2.setMessage("False");
+        Room room = LabUtils.FindRoom(chater.getRoomId());
+        if(chater.getRoomId()==null||chater.getUserId()==null||room==null) {
+            chater2.setMessage("FALSE");
             return chater2;
+        }
+        List<RoomUserDTO> roomUserDTOList =new ArrayList<>();
+        List<RoomUser> roomUserList = LabUtils.FindRoom(chater.getRoomId()).getUserlist();
+        int size = roomUserList.size();
+        for(int i=0;i<size;i++){
+            RoomUserDTO roomUserDTO = new RoomUserDTO();
+            roomUserDTO.setUserId(roomUserList.get(i).getUserId());
+            roomUserDTO.setNickname(roomUserList.get(i).getNickname());
+            roomUserDTO.setSeat(roomUserList.get(i).getSeat());
+            roomUserDTOList.add(roomUserDTO);
         }
         chater2.setMessage("SUCCEED");
         chater2.setRoomId(chater.getRoomId());
         chater2.setUserId(chater.getUserId());
-        chater2.setObject(LabUtils.FindRoom(chater.getRoomId()).getUserlist());
+        chater2.setObject(roomUserDTOList);
         return chater2;
-    }
-    @RequestMapping("/beginwerewolf")
+    } 
+    @RequestMapping("/werewolf")
     @ResponseBody
     public void BeginWerewolf(Chater chater) {
         Werewolf werewolf = (Werewolf) chater.getObject();
@@ -52,7 +99,7 @@ public class GameController {
             playerlist.remove(werewolf.getunPlayerlist().get(i));
         }
         Chater chater2 = new Chater();
-        chater2.setOrder("beginwerewolf");
+        chater2.setOrder("werewolf");
         chater2.setRoomId(chater.getRoomId());
 
         //上帝

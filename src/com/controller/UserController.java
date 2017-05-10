@@ -106,6 +106,8 @@ public class UserController {
 
 		Map<String,Object> objectMap= (Map<String, Object>) chater.getObject();
 		String type= (String) objectMap.get("type");
+		String path = this.getClass().getClassLoader().getResource("/").getPath();
+		System.out.println(path);
 		Session session=sessionFactory.getCurrentSession();
 		session.beginTransaction();
 		List<String> wordList=session.createQuery("SELECT word FROM GameWords where type=:type")
@@ -169,10 +171,11 @@ public class UserController {
 
     @RequestMapping("/upload")
     @ResponseBody
-    public Chater uploadFile(HttpServletRequest request,@RequestParam("excelFile")MultipartFile file){
+    public Chater uploadFile(HttpServletRequest request,MultipartFile file){
         //获取上传文件的名称
         String filename = file.getOriginalFilename();
-        File file2 = new File("C:\\Users\\Administrator\\Desktop\\hiparty\\hipartyDB\\loadfile\\");
+		String path = this.getClass().getClassLoader().getResource("/").getPath();
+		File file2 = new File(path+"loadfile");
         if (!file2.exists()) {
             //创建临时目录
             file2.mkdir();
@@ -188,11 +191,14 @@ public class UserController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Session session=sessionFactory.getCurrentSession();
+		String type =request.getContentType();
+
+		Session session=sessionFactory.getCurrentSession();
         session.beginTransaction();
 		LoadFile loadFile=new LoadFile();
 		loadFile.setFilename(filename);
-		loadFile.setFileUrl("C:\\Users\\Administrator\\Desktop\\hiparty\\hipartyDB\\loadfile\\"+filename);
+		loadFile.setFileUrl(path+"loadfile"+filename);
+		loadFile.setType(type);
 		session.save(loadFile);
 		session.getTransaction().commit();
 

@@ -8,9 +8,11 @@ package com.beans;
 import com.utils.RoomUserUtils;
 import org.apache.mina.core.session.IoSession;
 
+import java.io.Serializable;
+
 //@Entity
 //@Table(name="roomuser")
-public class RoomUser {
+public class RoomUser implements Serializable{
 	
 	private String userId;//用户id
 	private String nickname;//昵称
